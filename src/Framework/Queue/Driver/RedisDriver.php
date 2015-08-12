@@ -16,7 +16,7 @@ class RedisDriver extends Driver
 
     function receiveMessage($queue) {
         while( true ) {
-            if ( Redis::setnx('cinnamon-lock-' . $queue) ) {
+            if ( Redis::setnx('cinnamon-lock-' . $queue, 1) ) {
                 Redis::expire('cinnamon-lock-' . $queue, 1);
 
                 $return = Redis::zrange('cinnamon-queue-' . $queue, 0, 1);
