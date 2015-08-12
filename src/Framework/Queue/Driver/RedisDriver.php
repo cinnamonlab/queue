@@ -15,18 +15,39 @@ class RedisDriver extends Driver
         Redis::zadd('cinnamon-queue-' . $queue, $score, json_encode($data) );
 
         if ( Config::get('queue.auto_run', false) && defined('__APP__') ) {
+
             $base_path = __APP__;
             if ( ! file_exists( $base_path . "/commands/receive.php") ) {
                 $base_path = __APP__ . "/vendor/cinnamonlab/queue";
             }
 
+            $ip = $_SERVER['SERVER_ADDR'];
+            $process = Redis::get('cinnamon-process-' . $ip );
+            if ( $process != null ) {
+                if ( $process > date('U') - 600 ) {
+                    Redis::publish('cinnamon-process', $queue );
+                    return $this;
+                }
+                ob_start();
+                system("ps ax|grep commands/subscribe.php| grep -v grep");
+                $process = trim(ob_get_clean());
+                if ( strlen($process) > 0 ) {
+                    Redis::setex('cinnamon-process-' . $ip, date('U'), 1200 );
+                    Redis::publish('cinnamon-process', $queue );
+                    return $this;
+                }
+                $process = null;
+            }
+            Redis::setex('cinnamon-process-' . $ip, date('U'), 1200 );
 
-
-            exec("cd $base_path");
             $cmd = "nohup " . Config::get('queue.php_path', '/usr/bin/php' )
-                . " commands/receive.php > /dev/null &";
+                . " " . $base_path . "/commands/subscribe.php  > /dev/null &";
             exec($cmd);
+
+            Redis::publish('cinnamon-process', $queue );
+
         }
+        return $this;
 
     }
 
