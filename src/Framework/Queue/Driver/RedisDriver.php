@@ -17,7 +17,7 @@ class RedisDriver extends Driver
         if ( Config::get('queue.auto_run', false) && defined('__APP__') ) {
 
             $base_path = __APP__;
-            if ( ! file_exists( $base_path . "/commands/receive.php") ) {
+            if ( ! file_exists( $base_path . "/commands/subscribe.php") ) {
                 $base_path = __APP__ . "/vendor/cinnamonlab/queue";
             }
 
@@ -42,7 +42,7 @@ class RedisDriver extends Driver
             Redis::setex('cinnamon-process-' . $ip, date('U'), 1200 );
 
             $cmd = "nohup " . Config::get('queue.php_path', '/usr/bin/php' )
-                . " " . $base_path . "/commands/subscribe.php  > /dev/null &";
+                . " " . $base_path . "/commands/subscribe.php $ip > /dev/null &";
             exec($cmd);
 
             Redis::publish('cinnamon-process', $queue );
