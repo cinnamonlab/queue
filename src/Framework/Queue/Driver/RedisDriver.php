@@ -20,9 +20,12 @@ class RedisDriver extends Driver
                 Redis::expire('cinnamon-lock-' . $queue, 1);
 
                 $return = Redis::zrange('cinnamon-queue-' . $queue, 0, 1);
-                if ( $return ) {
-                    Redis::zrem('cinnamon-queue-' . $queue, $return);
-                }
+                if ( isset($return[0])) {
+                    $return = $return[0];
+                    if ( $return ) {
+                        Redis::zrem('cinnamon-queue-' . $queue, $return);
+                    }
+                } else $return = null;
                 Redis::del('cinnamon-lock-' . $queue);
                 try {
                     if ($return) return json_decode($return, true);
