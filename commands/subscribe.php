@@ -26,6 +26,20 @@ if ( $process == null ) {
     Redis::expire('cinnamon-process-' . $ip, 1200);
 
     try {
+
+        if (!$rs instanceof Driver)
+            throw FrameworkException::internalError('Queue Driver Not Set');
+        QueueProcessor::getInstance()->setDriver($rs)->setAsReceiver();
+
+        $message = $rs->receiveMessage('route');
+        if (!$message) continue;
+
+        Input::bind($message);
+        Route::reset();
+        Route::setSkipMain();
+        include __APP__ . "/route.php";
+
+
         $r->subscribe('cinnamon-process', function ($message, $channel) use ($r) {
             $tasks = $r->zrange('cinnamon-queue-' . $channel, 0, 10);
             if (count($tasks) > 0){
