@@ -14,15 +14,18 @@ class QueueProcessor extends Processor
     private $driver = null;
     public function setDriver( Driver $d ) {
         $this->driver = $d;
+        return $this;
     }
 
     private $receiver = false;
     public function setAsReceiver( ) {
         $this->receiver = true;
+        return $this;
     }
 
     public function setAsSender( ) {
         $this->receiver = false;
+        return $this;
     }
 
     public function then( $func ) {
