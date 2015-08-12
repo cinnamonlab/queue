@@ -15,6 +15,9 @@ $ip = $argv[1];
 $process = $r->get('cinnamon-process-' . $ip);
 
 if ( $process == null ) {
+    Redis::set('cinnamon-process-' . $ip, date('U') );
+    Redis::expire('cinnamon-process-' . $ip, 1200);
+
     try {
         $r->subscribe('cinnamon-process', function ($message, $channel) use ($r) {
             exec(Config::get('queue.php_path') . " " . __APP__ . "/commands/receive.php > /dev/null");
