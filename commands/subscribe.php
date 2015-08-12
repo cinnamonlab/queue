@@ -20,8 +20,9 @@ if ( $process == null ) {
 
     try {
         $r->subscribe('cinnamon-process', function ($message, $channel) use ($r) {
-            exec(Config::get('queue.php_path') . " " . __APP__ . "/commands/receive.php > /dev/null");
-
+            $tasks = $r->zrange('cinnamon-queue-' . $channel, 0, 10);
+            if ( count($tasks) > 0 )
+                exec(Config::get('queue.php_path') . " " . __APP__ . "/commands/receive.php > /dev/null");
         });
     } catch (Exception $e ) {
         //
