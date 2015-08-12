@@ -21,7 +21,7 @@ class RedisDriver extends Driver
 
                 $return = Redis::zrange('cinnamon-queue-' . $queue, 0, 1);
                 if ( $return ) {
-                    Redis::del('cinnamon-queue-' . $queue, $return);
+                    Redis::zrem('cinnamon-queue-' . $queue, $return);
                 }
                 Redis::del('cinnamon-lock-' . $queue);
                 try {
