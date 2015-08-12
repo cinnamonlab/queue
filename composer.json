@@ -1,0 +1,14 @@
+{
+  "name": "cinnamonlab/queue",
+  "require": {
+    "php": ">=5.5.9",
+    "cinnamonlab/framework":"dev-master",
+    "cinnamonlab/redis":"dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "Framework\\Queue\\": "src/Framework/Queue/"
+    }
+  },
+  "minimum-stability": "dev"
+}
