@@ -32,7 +32,8 @@ class RedisDriver extends Driver
                 system("ps ax|grep commands/subscribe.php| grep -v grep");
                 $process = trim(ob_get_clean());
                 if ( strlen($process) > 0 ) {
-                    Redis::setex('cinnamon-process-' . $ip, date('U'), 1200 );
+                    Redis::set('cinnamon-process-' . $ip, date('U') );
+                    Redis::expire('cinnamon-process-' . $ip, 1200);
                     Redis::publish('cinnamon-process', $queue );
                     return $this;
                 }
