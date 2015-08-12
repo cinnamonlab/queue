@@ -39,7 +39,8 @@ class RedisDriver extends Driver
                 }
                 $process = null;
             }
-            Redis::setex('cinnamon-process-' . $ip, date('U'), 1200 );
+            Redis::set('cinnamon-process-' . $ip, date('U') );
+            Redis::expire('cinnamon-process-' . $ip, 1200);
 
             $cmd = "nohup " . Config::get('queue.php_path', '/usr/bin/php' )
                 . " " . $base_path . "/commands/subscribe.php $ip > /dev/null &";
