@@ -31,20 +31,23 @@ if ( $process == null ) {
             if (count($tasks) > 0){
 
                 $rs = Config::get('driver', new RedisDriver() );
+                try {
+                    if (!$rs instanceof Driver)
+                        throw FrameworkException::internalError('Queue Driver Not Set');
+                    QueueProcessor::getInstance()->setDriver($rs)->setAsReceiver();
 
-                if ( !$rs instanceof Driver )
-                    throw FrameworkException::internalError('Queue Driver Not Set');
-                QueueProcessor::getInstance()->setDriver($rs)->setAsReceiver();
+                    for ($i = 0; $i < 10; $i++) {
+                        $message = $rs->receiveMessage('route');
+                        if (!$message) continue;
 
-                for ( $i = 0; $i < 10; $i++ ) {
-                    $message = $rs->receiveMessage('route');
-                    if ( ! $message ) continue;
+                        Input::bind($message);
+                        Route::reset();
+                        Route::setSkipMain();
+                        include __APP__ . "/route.php";
 
-                    Input::bind($message);
-                    Route::reset();
-                    Route::setSkipMain();
-                    include __APP__ . "/route.php";
-
+                    }
+                } catch (Exception $e) {
+                    //
                 }
             }
         });
