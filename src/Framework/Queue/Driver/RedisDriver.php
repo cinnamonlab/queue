@@ -21,7 +21,7 @@ class RedisDriver extends Driver
             }
             $cmd = "cd $base_path && nohup " . Config::get('queue.php_path', '/usr/bin/php' )
                 . " commands/receive.php > /dev/null &";
-
+            exec($cmd);
         }
 
     }
