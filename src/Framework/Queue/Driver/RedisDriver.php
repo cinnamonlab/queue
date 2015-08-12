@@ -19,7 +19,11 @@ class RedisDriver extends Driver
             if ( ! file_exists( $base_path . "/commands/receive.php") ) {
                 $base_path = __APP__ . "/vendor/cinnamonlab/queue";
             }
-            $cmd = "cd $base_path && nohup " . Config::get('queue.php_path', '/usr/bin/php' )
+
+
+
+            exec("cd $base_path");
+            $cmd = "nohup " . Config::get('queue.php_path', '/usr/bin/php' )
                 . " commands/receive.php > /dev/null &";
             exec($cmd);
         }
