@@ -3,6 +3,7 @@
   "require": {
     "php": ">=5.5.9",
     "cinnamonlab/framework":"dev-master",
+    "cinnamonlab/log":"dev-master",
     "cinnamonlab/redis":"dev-master"
   },
   "autoload": {

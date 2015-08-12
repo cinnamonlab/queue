@@ -8,6 +8,8 @@ use Framework\Input;
 use Framework\Processor\Processor;
 use Framework\Queue\Driver\Driver;
 use Framework\Queue\Driver\RedisDriver;
+use Exception;
+use Framework\Log\Log;
 
 class QueueProcessor extends Processor
 {
@@ -35,17 +37,21 @@ class QueueProcessor extends Processor
     }
 
     private function processAsReceiver( $func ) {
-        if ( is_callable( $func ) ) {
-            $func();
-        }
-        if ( is_string( $func ) ) {
-            $function_array = preg_split("/@/", $func );
-            if ( !isset($function_array[1]))
-                throw FrameworkException::internalError('Routing Error');
+        try {
+            if (is_callable($func)) {
+                $func();
+            }
+            if (is_string($func)) {
+                $function_array = preg_split("/@/", $func);
+                if (!isset($function_array[1]))
+                    throw FrameworkException::internalError('Routing Error');
 
-            $class_name = 'App\\Controller\\' . $function_array[0];
-            $method_name = $function_array[1];
-            $class_name::$method_name();
+                $class_name = 'App\\Controller\\' . $function_array[0];
+                $method_name = $function_array[1];
+                $class_name::$method_name();
+            }
+        } catch( Exception $e ) {
+            Log::error($e->getTraceAsString());
         }
         return $this;
 
